@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>总控后台 · 开站管理开发 PRD</title>
+  <script>
+    (function () {
+      if (window.top !== window) return
+      location.replace('/docs/index.html#master/open')
+    })()
+  </script>
+  <style>
+    :root {
+      --primary: #1d39c4;
+      --text: #1f1f1f;
+      --muted: #666;
+      --border: #eee;
+      --bg: #fafafa;
+      --ok: #52c41a;
+      --warn: #faad14;
+      --link: #1677ff;
+      --danger: #ff4d4f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
+      color: var(--text);
+      line-height: 1.7;
+      background: #f5f5f5;
+    }
+    header {
+      background: linear-gradient(90deg, #10239e 0%, #1d39c4 100%);
+      color: #fff;
+      padding: 28px 24px;
+    }
+    header h1 { margin: 0 0 8px; font-size: 26px; }
+    header p { margin: 0; opacity: 0.9; font-size: 14px; }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+    .meta span { background: rgba(255,255,255,.15); padding: 2px 10px; border-radius: 4px; }
+    .meta a { color: #fff; }
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
+    }
+    section {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 16px;
+    }
+    h2 {
+      margin: 0 0 16px;
+      font-size: 18px;
+      border-left: 4px solid var(--primary);
+      padding-left: 10px;
+    }
+    h3 { font-size: 15px; margin: 20px 0 10px; color: #333; }
+    p, li { font-size: 14px; }
+    ul, ol { padding-left: 20px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 12px 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: var(--bg); font-weight: 600; }
+    code {
+      background: #f5f5f5;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    .flow {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+      line-height: 1.9;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .tag-ok { color: var(--ok); font-weight: 600; }
+    .tag-no { color: var(--danger); }
+    .tag-view { color: var(--link); }
+    .tag-warn { color: var(--warn); font-weight: 600; }
+    a { color: var(--link); }
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 24px;
+    }
+    .toc a { text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>总控后台 · 开站管理开发 PRD</h1>
+    <p>包网服务商运营/技术侧 · 开站全流程状态推进与审核</p>
+    <div class="meta">
+      <span>版本 v1.2</span>
+      <span>更新 2026-08-13</span>
+      <span>模块 开站管理</span>
+      <span><a href="/master">总控原型</a></span>
+      <span><a href="/">商户原型</a></span>
+      <span><a href="/docs/merchant-site-open-prd.html">商户开站 PRD</a></span>
+      <span><a href="/docs/site-open-prd.html">总览 PRD</a></span>
+      <span><a href="/docs/master-site-bill-prd.html">站点账单 PRD</a></span>
+    </div>
+  </header>
+
+  <main>
+    <section class="toc">
+      <h2>目录</h2>
+      <ol>
+        <li><a href="#s1">背景与目标</a></li>
+        <li><a href="#s2">角色与边界</a></li>
+        <li><a href="#s3">页面结构</a></li>
+        <li><a href="#s4">数据来源与列表</a></li>
+        <li><a href="#s5">完整状态机</a></li>
+        <li><a href="#s6">各 Tab 操作列与弹窗</a></li>
+        <li><a href="#s7">关键业务规则</a></li>
+        <li><a href="#s8">字段与状态枚举</a></li>
+        <li><a href="#s9">留痕与非功能</a></li>
+        <li><a href="#s10">待确认项</a></li>
+      </ol>
+    </section>
+
+    <section id="s1">
+      <h2>1. 背景与目标</h2>
+      <p>总控后台由<strong>包网服务商运营/技术</strong>使用，负责受理商户开站申请、自行新增开站、推进建站状态，并完成技术/人工审核。</p>
+      <p><strong>本期目标：</strong></p>
+      <ul>
+        <li>实现总控「开站管理」7 Tab 原型，操作列可直接改变创建中→配置中→待审核→待付款等相关状态。</li>
+        <li>明确与商户后台的分工：总控推进与审核，商户发起、付款、上线后经营。</li>
+        <li>沉淀可落地的开发 PRD（本页），供正式开发对照。</li>
+      </ul>
+      <p><strong>原型入口：</strong><code>/master</code>（蓝色顶栏「包网总控」）</p>
+    </section>
+
+    <section id="s2">
+      <h2>2. 角色与边界</h2>
+      <table>
+        <thead><tr><th>后台</th><th>使用者</th><th>开站相关职责</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>总控后台</strong>（本 PRD）</td>
+            <td>包网运营/技术</td>
+            <td>新增开站、补充资料、站点配置、状态推进、审核、确认到账、强制冻结</td>
+          </tr>
+          <tr>
+            <td>商户/集团后台</td>
+            <td>集团/公司运营</td>
+            <td>新增站点申请、查看进度、付款、上线后修改/转让</td>
+          </tr>
+          <tr>
+            <td>站点后台</td>
+            <td>单站运营</td>
+            <td>皮肤/语言等日常运营配置</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="s3">
+      <h2>3. 页面结构</h2>
+      <p><strong>导航：</strong>开站管理（顶栏模块，默认打开）</p>
+      <p><strong>子 Tab（7）：</strong>创建中 · 配置中 · 待审核 · 待付款 · 已上线 · 已注销 · 全部站点</p>
+      <p><strong>顶部按钮规则：</strong></p>
+      <ul>
+        <li><strong>全部站点</strong>：展示「新增开站」+ 导出报表等</li>
+        <li><strong>创建中 / 配置中 / 待付款 / 已上线</strong>：不展示「新增开站」</li>
+      </ul>
+      <p><strong>列表增强：</strong>增加「来源」列（商户申请 / 总控创建），支持按来源筛选。</p>
+    </section>
+
+    <section id="s4">
+      <h2>4. 数据来源与列表</h2>
+      <table>
+        <thead><tr><th>来源</th><th>触发</th><th>初始状态</th></tr></thead>
+        <tbody>
+          <tr><td>商户申请</td><td>商户后台「新增站点」</td><td>总控受理后进入「创建中」</td></tr>
+          <tr><td>总控创建</td><td>总控「新增开站」（可预填 OSS、备域名、商务等）</td><td>「创建中」</td></tr>
+        </tbody>
+      </table>
+      <p>总控列表为<strong>全平台站点</strong>；商户列表仅本集团/公司。</p>
+    </section>
+
+    <section id="s5">
+      <h2>5. 完整状态机</h2>
+      <div class="flow">商户/总控「新增开站」──→ 创建中
+                │   ├─ 补充资料（商务必填）──→ 待付款
+                │   └─ 拒绝 → 已拒绝
+                ▼
+             待付款
+                │   ├─ 确认到账 / 商户付款 ──→ 配置中
+                │   ├─ 催办
+                │   └─ 关闭订单 → 待关闭
+                ▼
+             配置中
+                │   ├─ 站点配置（保存 →「已配置」）
+                │   ├─ 提交审核（仅已配置可提交）
+                │   └─ 退回创建中
+                ▼
+             待审核（开站待技术审）
+                │   ├─ 审核通过 → 已上线
+                │   ├─ 审核拒绝 → 已拒绝
+                │   └─ 退回配置中 → 配置中
+                ▼
+             已上线
+                │   └─ 注销申请 → 注销待技术审 → … → 已注销</div>
+    </section>
+
+    <section id="s6">
+      <h2>6. 各 Tab 操作列与弹窗</h2>
+
+      <h3>6.1 创建中</h3>
+      <p><strong>操作列：</strong>补充资料 · 拒绝 · 详情</p>
+      <p>补充资料保存后进入<strong>待付款</strong>（不再使用「进入配置中」）。</p>
+
+      <h3>6.2 待付款</h3>
+      <p><strong>操作列：</strong>确认到账 · 催办 · 关闭订单 · 详情</p>
+      <p>确认到账后进入<strong>配置中</strong>。</p>
+
+      <h3>6.3 配置中</h3>
+      <p><strong>操作列：</strong>站点配置 · 提交审核 · 退回创建中 · 详情</p>
+      <p>站点配置保存 →「已配置」；仅已配置可提交审核 → 待审核。</p>
+
+      <h3>6.4 待审核</h3>
+      <p><strong>操作列：</strong>审核通过 · 审核拒绝 · 退回配置中 · 详情</p>
+      <p>审核通过后进入<strong>已上线</strong>。</p>
+
+      <h3>6.5 已上线 / 已注销 / 全部站点</h3>
+      <ul>
+        <li>已上线：注销 · 详情（注销申请 → 注销待技术审）</li>
+        <li>已注销：详情</li>
+        <li>全部站点：修改 · 强制冻结 · 转让 · 注销 · 记录 · 详情</li>
+      </ul>
+    </section>
+
+    <section id="s7">
+      <h2>7. 关键业务规则</h2>
+      <ol>
+        <li class="tag-warn">创建中保存「补充资料」（对接商务必填）后进入待付款。</li>
+        <li class="tag-warn">待付款「确认到账」后进入配置中；商户侧「付款」同理。</li>
+        <li class="tag-warn">配置中必须先完成「站点配置」并进入「已配置」，才能「提交审核」。</li>
+        <li>审核通过直接上线；已上线/全部站点支持「注销」申请。</li>
+        <li>Toast 提示位置：屏幕垂直居中。</li>
+        <li>备注必填场景：拒绝、审核拒绝、关闭订单、退回创建中、退回配置中、注销。</li>
+        <li>状态变更须留痕：操作人、时间、原状态→新状态、备注。</li>
+      </ol>
+    </section>
+
+    <section id="s8">
+      <h2>8. 字段与状态枚举</h2>
+      <h3>8.1 开站状态（节选）</h3>
+      <p>创建中、配置中、<strong>已配置</strong>、开站待技术审、待付款、已上线、已拒绝、强制冻结、待关闭、已注销…</p>
+      <h3>8.2 站点配置弹窗必填项（总控）</h3>
+      <ul>
+        <li>基础信息：站点模式、代理模式、后台域名、OSS 厂商、皮肤/语言/时区、币种（多选）</li>
+        <li>LOGO与活动：长短昼夜 LOGO 上传、活动模版多选</li>
+        <li>资源授权（多选表格）：场馆授权、存款通道、提款通道、短信/邮件/客服通道</li>
+        <li>费用：开站费、线路维护费、授信额度、后台白名单类型</li>
+      </ul>
+      <h3>8.3 详情弹窗（只读）</h3>
+      <ul>
+        <li>创建中、配置中（未「已配置」）：仅展示「基本信息」Tab，隐藏配置类 Tab</li>
+        <li>已配置及之后（待审核/待付款/已上线/已注销）：展示全部配置 Tab，内容只读不可编辑</li>
+        <li>Tab 栏固定，内容区滚动</li>
+      </ul>
+      <h3>8.4 核心列表字段</h3>
+      <p>所属主站、站点类型、站点 ID、站点名称、<strong>来源</strong>、集团/公司、站点模式、持有人、对接商务、皮肤、币种、时区、后台域名、余额/押金/线路费、合并状态、开站状态、操作人、操作时间、操作列。筛选栏「币种」为复选框多选。</p>
+    </section>
+
+    <section id="s9">
+      <h2>9. 留痕与非功能</h2>
+      <ul>
+        <li>每次状态推进写入操作记录（可在「记录」弹窗展示）。</li>
+        <li>语言：简体中文；主题：总控蓝色顶栏（#1d39c4）。</li>
+        <li>原型阶段：本地 Mock，操作以 Message/状态切换演示。</li>
+        <li>与商户后台同域部署：商户 <code>/</code>，总控 <code>/master</code>。</li>
+      </ul>
+    </section>
+
+    <section id="s10">
+      <h2>10. 待确认项</h2>
+      <ol>
+        <li>「已配置」是否作为独立 Tab，还是仅作为配置中 Tab 内子状态？（原型：配置中 Tab 内子状态）</li>
+        <li>退回配置中后，是否清空已填配置、强制重新「站点配置」？</li>
+        <li>审核通过是否拆分一审（system）/ 二审（人工）两个操作按钮？</li>
+        <li>待付款「确认到账」是否需谷歌验证码？</li>
+        <li>强制冻结是否仅总控可用？</li>
+      </ol>
+    </section>
+  </main>
+
+  <footer>
+    wg-admin-prototype · 总控开站管理 PRD v1.1 ·
+    <a href="/master">总控原型</a> ·
+    <a href="/docs/site-open-prd.html">总览 PRD</a> ·
+    <a href="/docs/master-site-bill-prd.html">站点账单 PRD</a> ·
+    <a href="/">商户原型</a>
+  </footer>
+</body>
+</html>

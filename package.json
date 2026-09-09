@@ -1,0 +1,30 @@
+{
+  "name": "wg-admin-prototype",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "generate:prd": "node scripts/generate-prd-page.mjs",
+    "build": "node scripts/generate-prd-page.mjs && tsc -b && vite build",
+    "preview": "vite preview",
+    "deploy": "npm run build && wrangler deploy",
+    "deploy:pages": "npm run build && wrangler pages deploy dist --project-name wg-admin-prototype"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.6.1",
+    "antd": "^5.26.7",
+    "dayjs": "^1.11.13",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5",
+    "wrangler": "^4.21.0"
+  }
+}

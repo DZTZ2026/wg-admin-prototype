@@ -1,0 +1,60 @@
+<div data-title="站点后台 · IP白名单开发 PRD" data-sub="系统 · IP 白名单与浏览器授权码">
+  <section class="toc">
+    <h2>目录</h2>
+    <ol>
+      <li><a href="#s1">背景与入口</a></li>
+      <li><a href="#s2">页面结构</a></li>
+      <li><a href="#s3">IP白名单 Tab</a></li>
+      <li><a href="#s4">浏览器授权码 Tab</a></li>
+      <li><a href="#s5">弹窗</a></li>
+    </ol>
+  </section>
+
+  <section id="s1">
+    <h2>1. 背景与入口</h2>
+    <p>系统模块用于后台访问安全管控。本期开放「IP白名单」，含 IP 名单与浏览器授权码两个子 Tab。</p>
+    <p><strong>原型入口：</strong><code>/</code> → 系统 → IP白名单</p>
+  </section>
+
+  <section id="s2">
+    <h2>2. 页面结构</h2>
+    <ul>
+      <li>子 Tab：IP白名单 · 浏览器授权码</li>
+      <li>页头展示后台域名主/备，可复制</li>
+      <li>公共：日/周/月、统一时间范围选择器、搜索/重置、新增、表格多选、全选当前页、批量操作、分页</li>
+    </ul>
+  </section>
+
+  <section id="s3">
+    <h2>3. IP白名单 Tab</h2>
+    <p><strong>关键词字段：</strong>IP、操作人、备注</p>
+    <p><strong>列表列：</strong>IP、地区、访问权限（管理后台）、备注、操作人、操作时间、操作（删除/修改）</p>
+    <p><strong>批量操作：</strong>批量删除</p>
+  </section>
+
+  <section id="s4">
+    <h2>4. 浏览器授权码 Tab</h2>
+    <p><strong>关键词字段：</strong>授权码、操作人、备注；另有状态下拉：全部 / 使用中 / 未使用 / 已过期</p>
+    <p><strong>列表列：</strong>授权码（可复制）、状态、到期时间、备注、操作（记录/删除）、操作人、操作时间</p>
+    <p><strong>批量操作：</strong>批量延时、批量删除</p>
+    <p>底部黄色提示：Chrome 插件 / WG加速器；集团授权码可登录集团及下属站点后台。</p>
+  </section>
+
+  <section id="s5">
+    <h2>5. 弹窗</h2>
+    <h3>5.1 新增/修改 IP</h3>
+    <ul>
+      <li>访问权限：管理后台（勾选）</li>
+      <li>IP地址（必填）；备注 0/40</li>
+      <li>新增多行时可 + / 删除行</li>
+    </ul>
+    <h3>5.2 新增授权码</h3>
+    <ul>
+      <li>前缀固定 <code>bm-</code>，后缀 9 位，支持自动生成</li>
+      <li>授权时间：7天 / 30天 / 90天 / 永久</li>
+      <li>备注 0/40；温情提示到期失效</li>
+    </ul>
+    <h3>5.3 授权码记录</h3>
+    <p>登录时间筛选 + 列表：登录时间、IP、类型（登录/IP变更）、结果。</p>
+  </section>
+</div>

@@ -1,0 +1,65 @@
+<div data-title="总控后台 · 集团账变开发 PRD" data-sub="报表 · 全平台集团账变 / 个人账变 / 充币订单">
+  <section class="toc">
+    <h2>目录</h2>
+    <ol>
+      <li><a href="#s1">背景与目标</a></li>
+      <li><a href="#s1b">数据范围（总控 vs 站点）</a></li>
+      <li><a href="#s2">页面结构</a></li>
+      <li><a href="#s3">集团账变筛选</a></li>
+      <li><a href="#s4">个人账变筛选</a></li>
+      <li><a href="#s5">充币订单筛选</a></li>
+      <li><a href="#s6">时间选择器</a></li>
+    </ol>
+  </section>
+
+  <section id="s1">
+    <h2>1. 背景与目标</h2>
+    <p>总控报表「集团账变」查看<strong>全平台</strong>集团资金流水、个人账变与充币订单；与站点后台同结构、不同数据范围。</p>
+    <p><strong>原型入口：</strong><code>/master</code> → 报表 → 集团账变</p>
+  </section>
+
+  <section id="s1b">
+    <h2>1b. 数据范围（总控 vs 站点）</h2>
+    <table>
+      <thead><tr><th>后台</th><th>数据范围</th><th>差异</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>总控后台（本 PRD）</td>
+          <td class="tag-ok">全平台所有集团 / 站点</td>
+          <td>可按「所属集团」筛选</td>
+        </tr>
+        <tr>
+          <td>站点后台</td>
+          <td class="tag-warn">当前登录站点所属集团</td>
+          <td>仅本集团，无跨集团数据</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="s2">
+    <h2>2. 页面结构</h2>
+    <p><strong>子 Tab：</strong>集团账变 · 个人账变 · 充币订单（均带「新」）</p>
+    <p>公共：日/周/月、统一时间范围、搜索/重置、导出、分页；顶部范围提示条。</p>
+  </section>
+
+  <section id="s3">
+    <h2>3. 集团账变筛选</h2>
+    <p>所属集团（总控专属）+ 站点关键词字段 + 账变类型 / 细项 / 交易对象（与站点侧选项一致）。</p>
+  </section>
+
+  <section id="s4">
+    <h2>4. 个人账变筛选</h2>
+    <p>编号、账变类型（商务佣金返佣等）、交易对象（含钱包）。</p>
+  </section>
+
+  <section id="s5">
+    <h2>5. 充币订单筛选</h2>
+    <p>所属集团（总控）+ 充币/审核时间 + 站点/订单关键词 + 状态 + 订单类型。</p>
+  </section>
+
+  <section id="s6">
+    <h2>6. 时间选择器</h2>
+    <p>统一 <code>FilterRangePicker</code>（今日～上月快捷 + 时分秒 + 清空/确定）。</p>
+  </section>
+</div>

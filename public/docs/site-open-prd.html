@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>开站管理 · 开发 PRD（商户 + 总控）</title>
+  <script>
+    (function () {
+      if (window.top !== window) return
+      location.replace('/prd.html#master/open')
+    })()
+  </script>
+  <style>
+    :root {
+      --primary: #d72c2c;
+      --text: #1f1f1f;
+      --muted: #666;
+      --border: #eee;
+      --bg: #fafafa;
+      --ok: #52c41a;
+      --link: #1677ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
+      color: var(--text);
+      line-height: 1.7;
+      background: #f5f5f5;
+    }    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 28px 24px;
+    }
+    header h1 { margin: 0 0 8px; font-size: 26px; }
+    header p { margin: 0; opacity: 0.9; font-size: 14px; }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+    .meta span { background: rgba(255,255,255,.15); padding: 2px 10px; border-radius: 4px; }
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
+    }
+    section {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 16px;
+    }
+    h2 {
+      margin: 0 0 16px;
+      font-size: 18px;
+      border-left: 4px solid var(--primary);
+      padding-left: 10px;
+    }
+    h3 { font-size: 15px; margin: 20px 0 10px; color: #333; }
+    p, li { font-size: 14px; }
+    ul, ol { padding-left: 20px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 12px 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+    }
+    th { background: var(--bg); font-weight: 600; }
+    code {
+      background: #f5f5f5;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    .flow {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px;
+      font-family: Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.9;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .tag-ok { color: var(--ok); font-weight: 600; }
+    .tag-no { color: #ff4d4f; }
+    .tag-view { color: var(--link); }
+    a { color: var(--link); }
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 24px;
+    }
+    .toc a { text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>开站管理 · 开发 PRD</h1>
+    <p>商户/集团后台 + 包网总控后台 · 产品需求文档</p>
+    <div class="meta">
+      <span>版本 v1.1</span>
+      <span>更新 2026-08-12</span>
+      <span>模块 开站管理</span>
+      <span><a href="/" style="color:#fff">商户后台原型</a></span>
+      <span><a href="/master" style="color:#fff">总控后台原型</a></span>
+      <span><a href="/docs/merchant-site-open-prd.html" style="color:#fff">商户开站 PRD</a></span>
+      <span><a href="/docs/master-site-open-prd.html" style="color:#fff">总控开站 PRD</a></span>
+      <span><a href="/docs/merchant-site-bill-prd.html" style="color:#fff">站点账单 PRD</a></span>
+      <span><a href="/docs/master-site-bill-prd.html" style="color:#fff">总控账单 PRD</a></span>
+    </div>
+  </header>
+
+  <main>
+    <section class="toc">
+      <h2>目录</h2>
+      <ol>
+        <li><a href="#s1">背景与目标</a></li>
+        <li><a href="#s2">系统边界（商户后台 vs 总控后台）</a></li>
+        <li><a href="#s3">完整开站审核流程</a></li>
+        <li><a href="#s4">页面结构</a></li>
+        <li><a href="#s5">Tab 与状态机</a></li>
+        <li><a href="#s6">功能清单</a></li>
+        <li><a href="#s6-1">新增站点弹窗</a></li>
+        <li><a href="#s6-2">全部站点操作弹窗</a></li>
+        <li><a href="#s7">筛选与表格</a></li>
+        <li><a href="#s8">权限矩阵</a></li>
+        <li><a href="#s9">数据字段</a></li>
+        <li><a href="#s10">异常与分支流程</a></li>
+        <li><a href="#s11">非功能需求</a></li>
+        <li><a href="#s12">待确认项</a></li>
+        <li><a href="#s13">总控后台 · 开站管理</a></li>
+        <li><a href="#s14">双后台对比与状态推进</a></li>
+      </ol>
+    </section>
+
+    <section id="s1">
+      <h2>1. 背景与目标</h2>
+      <p>包网 SaaS 体系中，<strong>商户/集团后台</strong>（如「伯乐 1179」）由集团或公司运营人员使用，负责发起开站、付款、查看进度，以及站点上线后的日常经营操作。</p>
+      <p><strong>本期目标：</strong></p>
+      <ul>
+        <li>实现开站管理模块的可交互原型，覆盖 7 个状态 Tab 及核心弹窗。</li>
+        <li>明确商户后台与总控后台的职责边界，供后续双后台拆分开发。</li>
+        <li>沉淀开站主链路与审核规则，作为正式开发的 PRD 基线。</li>
+      </ul>
+      <p><strong>不在本期：</strong>真实 API 对接、总控后台独立工程、支付扣款逻辑、谷歌验证码校验。</p>
+    </section>
+
+    <section id="s2">
+      <h2>2. 系统边界</h2>
+      <table>
+        <thead>
+          <tr><th>后台</th><th>使用者</th><th>与开站相关职责</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>商户/集团后台</strong>（本 PRD）</td>
+            <td>集团/公司运营</td>
+            <td>新增站点、查看进度、付款、上线后修改/转让/查看详情</td>
+          </tr>
+          <tr>
+            <td><strong>总控后台</strong></td>
+            <td>包网服务商运营/技术</td>
+            <td>受理申请、补充基础设施、创建中 provisioning、配置中平台费率、一审/二审审核、强制冻结</td>
+          </tr>
+          <tr>
+            <td><strong>站点后台</strong></td>
+            <td>单站运营</td>
+            <td>皮肤、语言、会员/活动等运营配置（修改弹窗提示跳转）</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="s3">
+      <h2>3. 完整开站审核流程</h2>
+
+      <h3>3.1 主链路总览</h3>
+      <div class="flow">① 商户：新增站点（提交业务信息）
+        ↓
+② 总控：受理 & 补充信息（站点 ID、OSS、备域名、商务、费率确认）
+        ↓
+③ 创建中（总控：基础设施 provisioning）
+        ↓
+④ 配置中（总控平台配置 + 商户可选进站点后台做运营配置）
+        ↓
+⑤ 待审核
+   ├─ 一审：开站待技术审（system 系统自动）
+   └─ 二审：人工审核（总控运营/商务，如 tempo）
+        ↓
+⑥ 待付款（商户从集团余额/授信扣款）
+        ↓
+⑦ 已上线（商户：修改 / 转让 / 记录 / 详情）</div>
+
+      <h3>3.2 分阶段说明</h3>
+      <table>
+        <thead>
+          <tr><th>阶段</th><th>状态</th><th>商户后台</th><th>总控后台</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>0. 开站前</td>
+            <td>—</td>
+            <td class="tag-ok">确认额度；填写新增站点表单并提交</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>1. 受理</td>
+            <td>→ 创建中</td>
+            <td class="tag-view">查看进度</td>
+            <td class="tag-ok">分配站点 ID、OSS、备域名、对接商务、确认费率额度</td>
+          </tr>
+          <tr>
+            <td>2. 创建中</td>
+            <td>创建中</td>
+            <td class="tag-view">仅查看（记录/详情）</td>
+            <td class="tag-ok">创建实例、主备域名、OSS、账户初始化</td>
+          </tr>
+          <tr>
+            <td>3. 配置中</td>
+            <td>配置中</td>
+            <td class="tag-view">查看；可进站点后台配置运营项</td>
+            <td class="tag-ok">游戏平台、默认费率；复制站点配置落地</td>
+          </tr>
+          <tr>
+            <td>4. 待审核</td>
+            <td>开站待技术审</td>
+            <td class="tag-view">仅查看（记录/详情），<strong>不可审核</strong></td>
+            <td class="tag-ok">一审（system）+ 二审（人工）</td>
+          </tr>
+          <tr>
+            <td>5. 待付款</td>
+            <td>待付款</td>
+            <td class="tag-ok">付款操作</td>
+            <td class="tag-view">查看、催办</td>
+          </tr>
+          <tr>
+            <td>6. 已上线</td>
+            <td>已上线</td>
+            <td class="tag-ok">修改、转让、记录、详情</td>
+            <td class="tag-ok">全量管理、强制冻结</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>3.3 审批留痕（记录弹窗）</h3>
+      <p>站点上线后，「记录」弹窗展示完整审批链：</p>
+      <ul>
+        <li><strong>一审备注：</strong>审核通过 · 审批人 system · 审批时间（系统自动技术审）</li>
+        <li><strong>二审备注：</strong>审核通过 · 审批人 tempo · 审批时间（总控人工审）</li>
+      </ul>
+
+      <h3>3.4 关键结论</h3>
+      <ul>
+        <li>商户在<strong>待审核阶段只读</strong>，审核按钮应仅在总控后台出现。</li>
+        <li>商户在<strong>待付款阶段必须能付款</strong>，不能全程只读。</li>
+        <li>皮肤/语言修改需跳转<strong>站点后台</strong>，不在集团后台修改弹窗内完成。</li>
+        <li>转让/注销另有独立审核链：技术审（总控）+ 集团审（商户集团负责人）。</li>
+      </ul>
+    </section>
+
+    <section id="s4">
+      <h2>4. 页面结构</h2>
+      <p><strong>路径：</strong>组织管理 → 开站管理</p>
+      <p><strong>顶部操作区（全部站点 Tab）：</strong></p>
+      <ul>
+        <li>新增站点（可用）</li>
+        <li>新增子品牌（置灰）</li>
+        <li>站点合并（置灰）</li>
+        <li>导出报表</li>
+      </ul>
+      <p><strong>子 Tab（7 个）：</strong>创建中 · 配置中 · 待审核 · 待付款 · 已上线 · 已注销 · 全部站点</p>
+      <p><strong>底部：</strong>已上线/全部站点 Tab 显示批量操作栏（批量导出、批量下线、已选计数）。</p>
+    </section>
+
+    <section id="s5">
+      <h2>5. Tab 与状态机</h2>
+      <h3>5.1 Tab 视图（进程阶段）</h3>
+      <p>创建中 → 配置中 → 待审核 → 待付款 → 已上线 → 已注销；「全部站点」汇总各状态。</p>
+
+      <h3>5.2 开站状态枚举（筛选/列展示）</h3>
+      <p>待付款、开站待技术审、创建中、配置中、已上线、强制冻结、转让待技术审、注销待技术审、转让待集团审、注销待集团审、已注销、注销中、已拒绝、待外部接收、待关闭</p>
+
+      <h3>5.3 待审核子状态（待审核 Tab 筛选项）</h3>
+      <p>开站待技术审、转让待技术审、转让待集团审、注销待技术审、注销待集团审、待外部接收</p>
+
+      <h3>5.4 各 Tab 默认操作列</h3>
+      <table>
+        <thead><tr><th>Tab</th><th>操作列</th></tr></thead>
+        <tbody>
+          <tr><td>创建中</td><td>详情</td></tr>
+          <tr><td>配置中</td><td>（无，或详情）</td></tr>
+          <tr><td>待审核</td><td>审核（<em>原型保留，正式版应移至总控</em>）</td></tr>
+          <tr><td>待付款</td><td>付款</td></tr>
+          <tr><td>已上线</td><td>详情</td></tr>
+          <tr><td>已注销</td><td>详情</td></tr>
+          <tr><td>全部站点</td><td>修改 · 强制冻结 · 转让 · 记录 · 详情</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="s6">
+      <h2>6. 功能清单</h2>
+      <table>
+        <thead><tr><th>功能</th><th>优先级</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td>7 状态 Tab 切换</td><td>P0</td><td>切换时重置/保留选中行策略</td></tr>
+          <tr><td>多条件筛选 + 重置 + 搜索</td><td>P0</td><td>全部站点两行筛选；待审核含开站审核状态</td></tr>
+          <tr><td>数据表格 + 分页 + 排序</td><td>P0</td><td>站点 ID、余额等可排序</td></tr>
+          <tr><td>新增站点弹窗</td><td>P0</td><td>见 6.1</td></tr>
+          <tr><td>全部站点五类操作弹窗</td><td>P0</td><td>见 6.2</td></tr>
+          <tr><td>后台域名主/备 + 复制</td><td>P1</td><td>全部站点表格列</td></tr>
+          <tr><td>批量操作</td><td>P2</td><td>批量导出、批量下线</td></tr>
+          <tr><td>导出报表</td><td>P2</td><td>原型占位</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="s6-1">
+      <h2>6.1 新增站点弹窗</h2>
+      <p><strong>触发：</strong>全部站点 Tab →「新增站点」</p>
+      <table>
+        <thead><tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td>所属公司</td><td>下拉</td><td>是</td><td>含「无」选项</td></tr>
+          <tr><td>复制站点</td><td>下拉</td><td>否</td><td>含 9 类配置复制说明 Tooltip</td></tr>
+          <tr><td>安全码</td><td>密码</td><td>是</td><td>联系人加密密钥，含说明 Tooltip</td></tr>
+          <tr><td>站点名称</td><td>文本</td><td>是</td><td></td></tr>
+          <tr><td>站点持有人</td><td>下拉</td><td>是</td><td></td></tr>
+          <tr><td>后台域名</td><td>前缀 + .cg.ink</td><td>是</td><td>后缀固定</td></tr>
+          <tr><td>白名单</td><td>IP / 授权码</td><td>条件</td><td>授权码可一键生成</td></tr>
+          <tr><td>皮肤版式</td><td>下拉</td><td>是</td><td>15 项</td></tr>
+          <tr><td>客户端皮肤</td><td>下拉</td><td>是</td><td>15 项</td></tr>
+          <tr><td>语言</td><td>多选 Checkbox</td><td>是</td><td>支持全选</td></tr>
+          <tr><td>客户端语言匹配模式</td><td>单选</td><td>是</td><td>含 Tooltip</td></tr>
+          <tr><td>时区</td><td>下拉</td><td>是</td><td></td></tr>
+          <tr><td>币种</td><td>多选</td><td>是</td><td></td></tr>
+          <tr><td>代理模式</td><td>单选</td><td>是</td><td>3 种模式</td></tr>
+          <tr><td>收费标准</td><td>只读面板</td><td>—</td><td>开站费、押金、线路维护费</td></tr>
+          <tr><td>授信额度(U)</td><td>数字</td><td>是</td><td></td></tr>
+          <tr><td>自动额度首月默认值</td><td>只读</td><td>—</td><td>20000</td></tr>
+          <tr><td>备注</td><td>文本域</td><td>否</td><td>0/200</td></tr>
+        </tbody>
+      </table>
+      <p><strong>提交后：</strong>生成开站申请，进入总控受理 → 创建中（见第 3 章流程）。</p>
+    </section>
+
+    <section id="s6-2">
+      <h2>6.2 全部站点操作弹窗</h2>
+
+      <h3>修改</h3>
+      <ul>
+        <li>只读：所属集团、所属公司、站点类型、客户端皮肤、语言匹配模式、语言、时区、开站费/押金/线路维护费</li>
+        <li>可编辑：站点名称、站点持有人、后台域名前缀、备注</li>
+        <li>橙色提示：皮肤/语言请前往站点后台修改</li>
+      </ul>
+
+      <h3>强制冻结</h3>
+      <ul>
+        <li>绿色确认文案：站点名称 + 站点 ID + 是否冻结</li>
+        <li>备注（0/200）、谷歌验证码（必填）</li>
+      </ul>
+
+      <h3>转让站点</h3>
+      <ul>
+        <li>只读：所属集团、所属公司、站点名称</li>
+        <li>转让类型：内部转让 / 外部转让</li>
+        <li>内部：转让公司下拉（必填）</li>
+        <li>外部：绿色提示「需审核，请联系商务」</li>
+        <li>备注、谷歌验证码（必填）</li>
+      </ul>
+
+      <h3>记录</h3>
+      <ul>
+        <li>站点档案 + 审批信息（一审/二审备注、审批人、时间）</li>
+        <li>底部仅「关闭」</li>
+      </ul>
+
+      <h3>详情</h3>
+      <ul>
+        <li>三栏摘要：站点配置、财务额度、运营网络信息</li>
+        <li>游戏平台筛选表：游戏类型、平台名称、币种、默认费率、调整后价格</li>
+        <li>分页 + 底部「关闭」</li>
+      </ul>
+    </section>
+
+    <section id="s7">
+      <h2>7. 筛选与表格</h2>
+      <h3>7.1 全部站点筛选（两行）</h3>
+      <p>操作时间类型、日/周/月、站点 ID/名称、开站状态、合并状态、语言、皮肤版式、客户端皮肤、时区、币种等。</p>
+
+      <h3>7.2 表格核心列</h3>
+      <p>所属主站、站点类型、站点 ID、站点名称、集团/公司、站点模式、持有人、商务、推荐信息、皮肤、币种、时区、后台域名（主/备）、余额（红色）、押金、线路费、三方优惠、合并状态、开站状态（已上线绿色）、操作人、操作时间、操作列。</p>
+    </section>
+
+    <section id="s8">
+      <h2>8. 权限矩阵（商户后台）</h2>
+      <table>
+        <thead><tr><th>阶段</th><th>查看</th><th>新增</th><th>付款</th><th>修改</th><th>转让</th><th>审核</th><th>强制冻结</th></tr></thead>
+        <tbody>
+          <tr><td>创建中/配置中</td><td class="tag-ok">✓</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="tag-no">✗</td><td>—</td></tr>
+          <tr><td>待审核</td><td class="tag-ok">✓</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="tag-no">✗</td><td>—</td></tr>
+          <tr><td>待付款</td><td class="tag-ok">✓</td><td>—</td><td class="tag-ok">✓</td><td>—</td><td>—</td><td class="tag-no">✗</td><td>—</td></tr>
+          <tr><td>已上线</td><td class="tag-ok">✓</td><td class="tag-ok">✓</td><td>—</td><td class="tag-ok">✓</td><td class="tag-ok">✓</td><td class="tag-no">✗</td><td>视权限</td></tr>
+          <tr><td>已注销</td><td class="tag-ok">✓</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="tag-no">✗</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="s9">
+      <h2>9. 核心数据字段</h2>
+      <table>
+        <thead><tr><th>字段</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td>siteId</td><td>站点 ID，总控分配</td></tr>
+          <tr><td>siteName</td><td>站点名称</td></tr>
+          <tr><td>siteType</td><td>主站点 / 子品牌等</td></tr>
+          <tr><td>groupId / companyId</td><td>所属集团、公司</td></tr>
+          <tr><td>openStatus</td><td>开站状态（见 5.2）</td></tr>
+          <tr><td>primaryDomain / backupDomain</td><td>主/备后台域名</td></tr>
+          <tr><td>balance / deposit / lineFee</td><td>余额、押金、线路维护费</td></tr>
+          <tr><td>clientSkin / currency / timezone</td><td>皮肤、币种、时区</td></tr>
+          <tr><td>owner / business / referrer</td><td>持有人、对接商务、推荐人</td></tr>
+          <tr><td>operateTime</td><td>操作/开站时间</td></tr>
+          <tr><td>source</td><td>来源：商户申请 / 总控创建（<strong>总控列表专用</strong>）</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="s10">
+      <h2>10. 异常与分支流程</h2>
+      <h3>10.1 审核拒绝</h3>
+      <p>待审核 → 一审/二审拒绝 → <strong>已拒绝</strong> → 商户查看原因 → 可修改后重新提交。</p>
+
+      <h3>10.2 付款超时</h3>
+      <p>待付款长期未付 → <strong>待关闭</strong> → 可能进入已注销流程。</p>
+
+      <h3>10.3 转让（上线后）</h3>
+      <ul>
+        <li>内部转让：转让待技术审 → 转让待集团审 → 完成</li>
+        <li>外部转让：联系商务 → 转让待技术审 → 待外部接收 → 完成</li>
+      </ul>
+
+      <h3>10.4 注销（上线后）</h3>
+      <p>注销待技术审 → 注销待集团审 → 已注销</p>
+
+      <h3>10.5 强制冻结</h3>
+      <p>需谷歌验证码 + 备注；状态变为强制冻结；已注销行仅保留记录/详情操作。</p>
+    </section>
+
+    <section id="s11">
+      <h2>11. 非功能需求</h2>
+      <ul>
+        <li>语言：简体中文</li>
+        <li>主题：商户后台红色顶栏（#d72c2c），表格与 Ant Design 5 组件规范</li>
+        <li>原型阶段：本地 Mock 数据，操作成功以 Message 提示</li>
+        <li>响应式：筛选区在宽屏不换行；小屏可横向滚动</li>
+      </ul>
+    </section>
+
+    <section id="s12">
+      <h2>12. 待确认项</h2>
+      <ol>
+        <li>强制冻结在商户后台是否开放，或仅总控可操作？</li>
+        <li>配置中阶段商户是否必须在站点后台完成配置才能进入待审核？</li>
+        <li>待付款超时规则与自动关闭天数？</li>
+        <li>二审审批人角色定义（商务 vs 运营 vs 风控）？</li>
+        <li>已注销站点是否允许重新开站（同域名/同名称）？</li>
+      </ol>
+    </section>
+
+    <section id="s13">
+      <h2>13. 总控后台 · 开站管理</h2>
+      <p>包网服务商运营/技术人员使用的<strong>总控后台</strong>同样具备「开站管理」模块，Tab 结构与商户后台一致（7 个 Tab），但<strong>列表范围、数据来源、操作列能力</strong>不同。</p>
+
+      <h3>13.1 列表范围与数据来源</h3>
+      <table>
+        <thead><tr><th>来源</th><th>触发方式</th><th>初始状态</th></tr></thead>
+        <tbody>
+          <tr><td><strong>商户申请</strong></td><td>商户后台「新增站点」提交</td><td>进入总控受理 → 创建中</td></tr>
+          <tr><td><strong>总控创建</strong></td><td>总控后台「新增开站」直接新建</td><td>创建中（可预填 OSS、备域名、商务等）</td></tr>
+        </tbody>
+      </table>
+      <p>总控列表为<strong>全平台站点</strong>；商户列表仅为<strong>本集团/公司</strong>相关站点。总控表格增加<strong>「来源」</strong>列及筛选项。</p>
+
+      <h3>13.2 总控顶部操作</h3>
+      <ul>
+        <li><strong>新增开站</strong>（P0）：总控直接创建，表单在商户字段基础上增加 OSS 厂商、备域名、对接商务等</li>
+        <li>导出报表、批量操作（P2）</li>
+      </ul>
+
+      <h3>13.3 总控各 Tab 操作列（状态推进）</h3>
+      <p>总控通过操作列<strong>直接改变站点状态</strong>，每次变更需留痕（操作人、时间、原状态→新状态、备注）。</p>
+      <table>
+        <thead><tr><th>Tab</th><th>操作列</th><th>目标状态</th></tr></thead>
+        <tbody>
+          <tr><td>创建中</td><td>补充资料 · 进入配置中 · 拒绝 · 详情</td><td>配置中 / 已拒绝</td></tr>
+          <tr><td>配置中</td><td>提交审核 · 退回创建中 · 详情</td><td>待审核（开站待技术审）/ 创建中</td></tr>
+          <tr><td>待审核</td><td>审核通过 · 审核拒绝 · 详情</td><td>待付款 / 已拒绝</td></tr>
+          <tr><td>待付款</td><td>确认到账 · 催办 · 关闭订单 · 详情</td><td>已上线 / — / 待关闭</td></tr>
+          <tr><td>已上线</td><td>详情（全部站点 Tab 含修改/冻结/转让/记录/详情）</td><td>—</td></tr>
+          <tr><td>已注销</td><td>详情</td><td>—</td></tr>
+          <tr><td>全部站点</td><td>修改 · 强制冻结 · 转让 · 记录 · 详情</td><td>—</td></tr>
+        </tbody>
+      </table>
+
+      <h3>13.4 总控弹窗说明</h3>
+      <table>
+        <thead><tr><th>操作</th><th>弹窗内容</th></tr></thead>
+        <tbody>
+          <tr><td>补充资料</td><td>OSS 厂商、备域名、对接商务、线路费等基础设施字段</td></tr>
+          <tr><td>进入配置中 / 提交审核 / 审核通过 / 确认到账</td><td>确认文案 + 可选备注</td></tr>
+          <tr><td>拒绝 / 审核拒绝 / 关闭订单 / 退回创建中</td><td>备注必填</td></tr>
+          <tr><td>催办</td><td>确认后通知商户（原型 Message 提示）</td></tr>
+          <tr><td>详情</td><td>复用商户「详情」弹窗（三栏摘要 + 游戏平台表）</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="s14">
+      <h2>14. 双后台对比与状态推进</h2>
+
+      <h3>14.1 能力对比</h3>
+      <table>
+        <thead><tr><th>能力</th><th>商户后台</th><th>总控后台</th></tr></thead>
+        <tbody>
+          <tr><td>列表范围</td><td>本集团/公司</td><td>全平台</td></tr>
+          <tr><td>新增</td><td>新增站点</td><td>新增开站 + 接收商户申请</td></tr>
+          <tr><td>创建中~待审核</td><td class="tag-view">仅查看</td><td class="tag-ok">推进/回退状态</td></tr>
+          <tr><td>待审核</td><td class="tag-no">不可审核</td><td class="tag-ok">审核通过/拒绝</td></tr>
+          <tr><td>待付款</td><td class="tag-ok">付款</td><td class="tag-ok">确认到账 / 催办 / 关闭</td></tr>
+          <tr><td>已上线</td><td class="tag-ok">修改/转让/记录/详情</td><td class="tag-ok">全量管理 + 强制冻结</td></tr>
+        </tbody>
+      </table>
+
+      <h3>14.2 统一状态机（谁触发跳转）</h3>
+      <div class="flow">商户新增 ──┐
+总控新增 ──┼──→ 创建中 ──(总控：进入配置中)──→ 配置中 ──(总控：提交审核)──→ 待审核
+           │                                              ↑
+           │                                    总控：审核通过 / 拒绝
+           │                                              ↓
+           └────────────────────────────────── 待付款 ──(商户付款 或 总控确认到账)──→ 已上线</div>
+
+      <h3>14.3 状态变更留痕</h3>
+      <p>总控每次状态推进写入「记录」：操作人、操作时间、原状态 → 新状态、备注。与上线后「记录」弹窗中的审批信息结构一致，便于审计。</p>
+
+      <h3>14.4 原型入口</h3>
+      <ul>
+        <li><a href="/">商户后台原型</a> — 红色顶栏，路径 <code>/</code></li>
+        <li><a href="/master">总控后台原型</a> — 蓝色顶栏，路径 <code>/master</code></li>
+        <li><a href="/docs/master-site-open-prd.html">总控开站管理开发 PRD</a> — 独立文档</li>
+        <li><a href="/docs/merchant-site-bill-prd.html">站点后台 · 站点账单开发 PRD</a></li>
+        <li><a href="/docs/master-site-bill-prd.html">总控后台 · 站点账单开发 PRD</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    wg-admin-prototype · 开站管理 PRD v1.1 ·
+    <a href="/">商户后台</a> ·
+    <a href="/master">总控后台</a>
+  </footer>
+</body>
+</html>

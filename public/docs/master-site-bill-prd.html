@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>总控后台 · 站点账单开发 PRD</title>
+  <script>
+    (function () {
+      if (window.top !== window) return
+      location.replace('/prd.html#master/bill')
+    })()
+  </script>
+  <style>
+    :root {
+      --primary: #1d39c4;
+      --text: #1f1f1f;
+      --muted: #666;
+      --border: #eee;
+      --bg: #fafafa;
+      --ok: #52c41a;
+      --warn: #faad14;
+      --link: #1677ff;
+      --danger: #ff4d4f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
+      color: var(--text);
+      line-height: 1.7;
+      background: #f5f5f5;
+    }
+    header {
+      background: linear-gradient(90deg, #10239e 0%, #1d39c4 100%);
+      color: #fff;
+      padding: 28px 24px;
+    }
+    header h1 { margin: 0 0 8px; font-size: 26px; }
+    header p { margin: 0; opacity: 0.9; font-size: 14px; }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+    .meta span { background: rgba(255,255,255,.15); padding: 2px 10px; border-radius: 4px; }
+    .meta a { color: #fff; }
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
+    }
+    section {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 16px;
+    }
+    h2 {
+      margin: 0 0 16px;
+      font-size: 18px;
+      border-left: 4px solid var(--primary);
+      padding-left: 10px;
+    }
+    h3 { font-size: 15px; margin: 20px 0 10px; color: #333; }
+    p, li { font-size: 14px; }
+    ul, ol { padding-left: 20px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 12px 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: var(--bg); font-weight: 600; }
+    code {
+      background: #f5f5f5;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    .flow {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+      line-height: 1.9;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .tag-ok { color: var(--ok); font-weight: 600; }
+    .tag-no { color: var(--danger); }
+    .tag-view { color: var(--link); }
+    .tag-warn { color: var(--warn); font-weight: 600; }
+    a { color: var(--link); }
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 24px;
+    }
+    .toc a { text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>总控后台 · 站点账单开发 PRD</h1>
+    <p>包网服务商运营/财务侧 · 全平台账单确认付款与异议处理</p>
+    <div class="meta">
+      <span>版本 v1.0</span>
+      <span>更新 2026-08-13</span>
+      <span>模块 运营 → 站点账单</span>
+      <span><a href="/master">总控原型</a></span>
+      <span><a href="/">站点原型</a></span>
+      <span><a href="/docs/merchant-site-bill-prd.html">站点账单 PRD</a></span>
+      <span><a href="/docs/master-site-open-prd.html">开站 PRD</a></span>
+    </div>
+  </header>
+
+  <main>
+    <section class="toc">
+      <h2>目录</h2>
+      <ol>
+        <li><a href="#s1">背景与目标</a></li>
+        <li><a href="#s2">角色与边界</a></li>
+        <li><a href="#s3">账单状态机</a></li>
+        <li><a href="#s4">页面结构</a></li>
+        <li><a href="#s5">Tab 与操作列</a></li>
+        <li><a href="#s6">总控侧操作与弹窗</a></li>
+        <li><a href="#s7">关键业务规则</a></li>
+        <li><a href="#s8">筛选、表格与字段</a></li>
+        <li><a href="#s9">详情弹窗与汇率</a></li>
+        <li><a href="#s10">留痕与非功能</a></li>
+        <li><a href="#s11">待确认项</a></li>
+      </ol>
+    </section>
+
+    <section id="s1">
+      <h2>1. 背景与目标</h2>
+      <p>总控后台由<strong>包网服务商运营/财务</strong>使用，负责全平台站点账单的结算跟踪、异议处理与确认付款。</p>
+      <p><strong>本期目标：</strong></p>
+      <ul>
+        <li>实现总控「运营 → 站点账单」9 Tab 原型，与站点后台共用状态机。</li>
+        <li>总控在待支付 / 已逾期 / 已坏账 / 全部账单执行「确认付款」，账单进入已支付。</li>
+        <li>站点负责核对与异议；总控不代替站点点「核对无误」。</li>
+        <li>沉淀可落地的开发 PRD（本页），供正式开发对照。</li>
+      </ul>
+      <p><strong>原型入口：</strong><code>/master</code> → 运营 → 站点账单（蓝色顶栏「包网总控」）</p>
+    </section>
+
+    <section id="s2">
+      <h2>2. 角色与边界</h2>
+      <table>
+        <thead><tr><th>后台</th><th>使用者</th><th>数据范围</th><th>账单职责</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>总控后台</strong>（本 PRD）</td>
+            <td>包网运营/财务</td>
+            <td>全平台</td>
+            <td>确认付款、异议账单编辑、退回待核对、全量查看</td>
+          </tr>
+          <tr>
+            <td>站点后台</td>
+            <td>集团/公司运营</td>
+            <td>本集团/公司</td>
+            <td>核对无误、提交异议、查看详情（详见 <a href="/docs/merchant-site-bill-prd.html">站点账单 PRD</a>）</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>总控列表为<strong>全平台账单</strong>；站点列表仅本集团/公司。同一账单状态在两侧实时一致。</p>
+    </section>
+
+    <section id="s3">
+      <h2>3. 账单状态机</h2>
+      <div class="flow">待下发 ──(系统：自然月结束后计算产生)──→ 待核对
+   │
+   ├─ 站点：核对无误 ──────────────────────────→ 待支付
+   │                                              │
+   │                                              ├─ 总控：确认付款 ──→ 已支付
+   │                                              └─ 系统：超过次月月底 ──→ 已逾期
+   │                                                                     │
+   │                                                                     ├─ 总控：确认付款 ──→ 已支付
+   │                                                                     └─ 系统：逾期超过 3 个月 ──→ 已坏账
+   │                                                                                          │
+   │                                                                                          └─ 总控：确认付款 ──→ 已支付
+   └─ 站点：存在异议 ──→ 存在异议
+                          ├─ 总控/站点：编辑（状态仍为存在异议）
+                          └─ 退回待核对 ──→ 待核对</div>
+      <p class="tag-warn">确认付款入口：待支付、已逾期、已坏账、全部账单（仅当该行状态为上述三者之一）。确认后全部账单中该行状态切换为「已支付」，并进入已支付 Tab。</p>
+    </section>
+
+    <section id="s4">
+      <h2>4. 页面结构</h2>
+      <p><strong>导航：</strong>运营 → 站点账单</p>
+      <p><strong>子 Tab（9）：</strong>待下发 · 待核对 · 待支付 · 存在异议 · 已逾期 · 已支付 · 已坏账 · 全部账单 · 账单明细</p>
+      <p><strong>顶部按钮：</strong>查看汇率（各 Tab）；导出报表（已支付 / 全部账单 / 账单明细）</p>
+      <p><strong>底部：</strong>待支付可批量确认付款；其余列表展示条数；金额单位说明为 U。</p>
+    </section>
+
+    <section id="s5">
+      <h2>5. Tab 与操作列</h2>
+      <table>
+        <thead><tr><th>Tab</th><th>总控操作列</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td>待下发</td><td>详情</td><td class="tag-view">系统未结算完成，只读</td></tr>
+          <tr><td>待核对</td><td>详情</td><td class="tag-view">等待站点核对；总控无「核对无误 / 存在异议」</td></tr>
+          <tr><td>待支付</td><td>确认付款 · 详情</td><td class="tag-ok">站点已核对无误；支持批量确认付款</td></tr>
+          <tr><td>存在异议</td><td>编辑 · 详情 · 退回待核对</td><td class="tag-ok">调整账单后可退回站点重新核对</td></tr>
+          <tr><td>已逾期</td><td>确认付款 · 详情</td><td class="tag-ok">由待支付超时进入，仍可确认付款</td></tr>
+          <tr><td>已支付</td><td>详情</td><td class="tag-view">终态只读</td></tr>
+          <tr><td>已坏账</td><td>确认付款 · 详情</td><td class="tag-ok">逾期超 3 个月；确认付款后仍进入已支付</td></tr>
+          <tr><td>全部账单</td><td>按该行状态显示对应按钮</td><td>待支付/已逾期/已坏账显示确认付款；存在异议显示编辑/退回</td></tr>
+          <tr><td>账单明细</td><td>—</td><td>厂商级明细，无操作列</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="s6">
+      <h2>6. 总控侧操作与弹窗</h2>
+
+      <h3>6.1 确认付款</h3>
+      <ul>
+        <li>入口：待支付、已逾期、已坏账操作列；全部账单中对应状态行；待支付底部「批量确认付款」</li>
+        <li>确认文案：确认后账单状态变更为「已支付」，并进入已支付列表</li>
+        <li>结果：状态 → <strong>已支付</strong>；待支付/已逾期/已坏账列表移除；全部账单该行状态改为已支付</li>
+      </ul>
+
+      <h3>6.2 编辑（存在异议）</h3>
+      <ul>
+        <li>可改：费用明细、实际支付总额 U、滞纳金、推荐折扣、站长备注</li>
+        <li>保存后状态仍为<strong>存在异议</strong>，需再点「退回待核对」才回到站点核对环节</li>
+      </ul>
+
+      <h3>6.3 退回待核对</h3>
+      <p>确认后状态 → <strong>待核对</strong>，站点需重新核对无误或再次提出异议。</p>
+
+      <h3>6.4 详情</h3>
+      <p>与站点后台同一详情弹窗结构（见第 9 节），总控可查看全平台任意账单。</p>
+    </section>
+
+    <section id="s7">
+      <h2>7. 关键业务规则</h2>
+      <ol>
+        <li class="tag-warn">待下发：尚未到达结算周期的账单；自然月结束后由系统计算产生，然后移入待核对。</li>
+        <li class="tag-warn">待核对：已产生的账单，由<strong>站点</strong>操作核对无误 / 存在异议 / 详情；核对无误 → 待支付；存在异议 → 存在异议。</li>
+        <li class="tag-warn">待支付：站点只能看详情；总控点「确认付款」→ 已支付。</li>
+        <li>存在异议：操作列提供编辑、详情、退回待核对。</li>
+        <li>已逾期：当月账单超过次月月底视为逾期，由待支付自动进入；状态由待支付切换为已逾期。</li>
+        <li>已支付：总控在待支付、已逾期、已坏账、全部账单点击确认付款后，账单均切换为已支付并进入已支付 Tab。</li>
+        <li>已坏账：逾期超过 3 个月视为已坏账；总控仍可确认付款使其进入已支付。</li>
+        <li>核对窗口 Tooltip：待核对每月月初 6 号 00:00:00 之后可点击直接确认无误。</li>
+        <li>滞纳金：逾期每多 1 天加收账单总额 0.05%/天，上不封顶（暂不收取）。</li>
+        <li>状态变更须留痕：操作人、时间、原状态 → 新状态、备注。</li>
+      </ol>
+    </section>
+
+    <section id="s8">
+      <h2>8. 筛选、表格与字段</h2>
+      <h3>8.1 筛选</h3>
+      <ul>
+        <li>账单月份；品牌字段（品牌 ID / 所属公司 / 品牌名称）；站点币种（单选）</li>
+        <li>已支付 / 全部账单：账单类型（每月账单 / 一次性费用）</li>
+        <li>全部账单：账单状态</li>
+        <li>账单明细：月份、主站 ID、币种、游戏类型、厂商名称</li>
+      </ul>
+      <h3>8.2 列表列</h3>
+      <p>品牌名称(ID)、品牌数、所属集团、所属公司、账单月份、账单类型、费用明细、实际支付总额 U、滞纳金、三方固定优惠、本月三方阶梯优惠、本月三方生效优惠、推荐折扣、账单状态、站长备注、操作时间、操作人、操作。</p>
+      <p>增列：待支付逾期倒计时；待核对/存在异议自动无误倒数；已逾期天数；已坏账「坏账总额 U」。</p>
+      <p>列不固定；斑马纹。已支付绿色；已逾期 / 已坏账 / 存在异议红色。</p>
+      <h3>8.3 金额口径</h3>
+      <ul>
+        <li>列表「实际支付总额 U」= 详情弹窗本账单合计，单位 U</li>
+        <li>账单合计 = 游戏账单 + CDN 流量费 + 线路维护费 + 其他费用 + 费用调整</li>
+        <li>实际需支付总额 U = 账单合计 + 推荐折扣</li>
+        <li>CDN 上限 = 当月游戏账单 × 10%，超出自动免除</li>
+        <li>费用调整：财务每月 5 号前人工导入模板</li>
+      </ul>
+    </section>
+
+    <section id="s9">
+      <h2>9. 详情弹窗与汇率</h2>
+      <ul>
+        <li>页头：所属集团、主站名称(ID)、账单月份、账单状态、站点余额（可刷新）、站长备注</li>
+        <li>费用指标：游戏账单、CDN 流量费、线路维护费、其他费用、费用调整、账单合计、推荐折扣、实际需支付总额 U（带问号说明）</li>
+        <li>明细表与小计；提示「*报表金额单位转换时可能存在尾数误差」</li>
+        <li>查看汇率：基础币种 / 兑换币种 / 站点汇率</li>
+      </ul>
+    </section>
+
+    <section id="s10">
+      <h2>10. 留痕与非功能</h2>
+      <ul>
+        <li>确认付款、编辑、退回待核对均写入操作人与操作时间。</li>
+        <li>语言：简体中文；主题：总控蓝色顶栏（#1d39c4）。</li>
+        <li>原型：本地 Mock，操作以 Message + 状态切换演示。</li>
+        <li>与站点后台同域：站点 <code>/</code>，总控 <code>/master</code>。</li>
+      </ul>
+    </section>
+
+    <section id="s11">
+      <h2>11. 待确认项</h2>
+      <ol>
+        <li>确认付款是否需要谷歌验证码 / 财务二次审核？</li>
+        <li>已坏账确认付款后，坏账总额是否清零、财务报表如何回冲？</li>
+        <li>总控是否允许在待核对代站点「核对无误」？（原型：不允许）</li>
+        <li>逾期/坏账计算时区、以及「超过 3 个月」按自然月还是 90 天？</li>
+        <li>滞纳金正式收取后，确认付款金额是否必须含滞纳金？</li>
+      </ol>
+    </section>
+  </main>
+
+  <footer>
+    wg-admin-prototype · 总控站点账单 PRD v1.0 ·
+    <a href="/master">总控原型</a> ·
+    <a href="/docs/merchant-site-bill-prd.html">站点账单 PRD</a> ·
+    <a href="/docs/master-site-open-prd.html">开站 PRD</a>
+  </footer>
+</body>
+</html>

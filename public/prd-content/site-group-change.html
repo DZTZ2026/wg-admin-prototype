@@ -1,0 +1,93 @@
+<div data-title="报表 · 集团账变开发 PRD" data-sub="总控全平台 / 站点本集团 · 集团账变 / 个人账变 / 充币订单">
+  <section class="toc">
+    <h2>目录</h2>
+    <ol>
+      <li><a href="#s1">背景与目标</a></li>
+      <li><a href="#s1b">数据范围（总控 vs 站点）</a></li>
+      <li><a href="#s2">页面结构</a></li>
+      <li><a href="#s3">集团账变筛选</a></li>
+      <li><a href="#s4">个人账变筛选</a></li>
+      <li><a href="#s5">充币订单筛选</a></li>
+      <li><a href="#s6">时间选择器</a></li>
+    </ol>
+  </section>
+
+  <section id="s1">
+    <h2>1. 背景与目标</h2>
+    <p>报表模块「集团账变」聚合集团资金流水、个人账变与充币订单查询。总控与站点共用同一套页面结构，数据范围不同。</p>
+    <p><strong>原型入口：</strong></p>
+    <ul>
+      <li>站点：<code>/</code> → 报表 → 集团账变（本集团/本站）</li>
+      <li>总控：<code>/master</code> → 报表 → 集团账变（全平台）</li>
+    </ul>
+  </section>
+
+  <section id="s1b">
+    <h2>1b. 数据范围（总控 vs 站点）</h2>
+    <table>
+      <thead><tr><th>后台</th><th>数据范围</th><th>差异</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>总控后台</td>
+          <td class="tag-ok">全平台所有集团 / 站点</td>
+          <td>可按「所属集团」筛选；Mock 含伯乐以外集团数据</td>
+        </tr>
+        <tr>
+          <td>站点后台</td>
+          <td class="tag-warn">当前登录站点所属集团</td>
+          <td>仅本集团账变与充币订单，无跨集团数据</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>页面结构、筛选项、子 Tab 两侧一致；仅列表数据源与范围提示不同。</p>
+  </section>
+
+  <section id="s2">
+    <h2>2. 页面结构</h2>
+    <p><strong>子 Tab：</strong>集团账变 · 个人账变 · 充币订单（均带「新」）</p>
+    <p>公共：日/周/月快捷、统一时间范围选择器、搜索/重置、导出报表、分页。</p>
+  </section>
+
+  <section id="s3">
+    <h2>3. 集团账变筛选</h2>
+    <table>
+      <thead><tr><th>筛选项</th><th>选项</th></tr></thead>
+      <tbody>
+        <tr><td>所属集团（仅总控）</td><td>全平台集团列表，可搜索</td></tr>
+        <tr><td>关键词字段</td><td>站点ID、所属公司、所属站点、编号</td></tr>
+        <tr><td>账变类型</td><td>账单、集团管理、公司管理、站点管理、API管理</td></tr>
+        <tr><td>账变细项</td><td>全部、人工增加/扣除、充币、转入/转出、主站/API/马甲包账单、押金增减、极光账单、开站费扣除、账单返利、专业SEO费用、冻结/解冻理赔保证金、赎回保证金、账单结算返现、滞纳金、站点合并余额/押金增减等</td></tr>
+        <tr><td>交易对象</td><td>系统、集团、公司、站点</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="s4">
+    <h2>4. 个人账变筛选</h2>
+    <ul>
+      <li>编号（文本）</li>
+      <li>账变类型：全部、商务佣金返佣、我的推荐返佣、转为余额、人工扣除、提币</li>
+      <li>交易对象：系统、集团、公司、站点、钱包</li>
+    </ul>
+  </section>
+
+  <section id="s5">
+    <h2>5. 充币订单筛选</h2>
+    <table>
+      <thead><tr><th>筛选项</th><th>选项</th></tr></thead>
+      <tbody>
+        <tr><td>所属集团（仅总控）</td><td>全平台集团列表</td></tr>
+        <tr><td>时间类型</td><td>充币时间、审核时间</td></tr>
+        <tr><td>站点关键词</td><td>公司名称、站点名称、站点ID</td></tr>
+        <tr><td>订单关键词</td><td>订单号、交易哈希值、钱包订单号</td></tr>
+        <tr><td>全部状态</td><td>待支付、支付成功、支付失败、支付超时</td></tr>
+        <tr><td>订单类型</td><td>后台订单、链上转账、保证金充值</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="s6">
+    <h2>6. 时间选择器</h2>
+    <p>原型全局筛选时间范围组件统一为：左侧快捷「今日 / 昨日 / 本周 / 上周 / 本月 / 上月」，支持开始/结束日期时间，底部清空与确定（<code>FilterRangePicker</code>）。</p>
+  </section>
+</div>

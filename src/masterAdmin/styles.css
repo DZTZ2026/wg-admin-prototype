@@ -1,0 +1,85 @@
+.master-app-shell .master-top-nav {
+  background: linear-gradient(90deg, #10239e 0%, #1d39c4 100%);
+}
+
+.master-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 220px;
+}
+
+.master-brand-icon {
+  font-size: 20px;
+  color: #fff;
+}
+
+.master-brand-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.master-app-shell .org-nav-modules {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  justify-content: center;
+  scrollbar-width: none;
+}
+
+.master-app-shell .org-nav-modules::-webkit-scrollbar {
+  display: none;
+}
+
+.master-app-shell .org-nav-item {
+  flex-shrink: 0;
+}
+
+.master-app-shell .org-nav-item .label {
+  white-space: nowrap;
+}
+
+.master-app-shell .org-nav-item.active {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.master-app-shell .org-module-menu {
+  background: #1d39c4;
+}
+
+.master-app-shell .org-module-menu-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.master-app-shell .org-module-menu-item.active {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.master-app-shell .org-workspace-tab.active {
+  color: #1d39c4;
+  border-top-color: #1d39c4;
+}
+
+.site-source-master {
+  color: #1d39c4;
+  font-weight: 500;
+}
+
+.site-source-merchant {
+  color: #389e0d;
+}
+
+.site-open-filter-spacer {
+  flex: 1;
+  min-width: 8px;
+}
+
+.site-open-page-master .site-open-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #1d39c4;
+}
+
+.site-open-page-master .site-open-tabs .ant-tabs-ink-bar {
+  background: #1d39c4;
+}
+
